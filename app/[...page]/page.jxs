@@ -1,0 +1,33 @@
+'use client';
+
+import { builder, BuilderComponent, useIsPreviewing } from '@builder.io/react';
+import React, { useEffect, useState } from 'react';
+
+builder.init(0ed22311ac6a4dbebeda1b4230c2746c); 
+
+export default function CatchAllPage({ params }) {
+  const [content, setContent] = useState(null);
+  const isPreviewing = useIsPreviewing();
+
+  useEffect(() => {
+    async function fetchContent() {
+      const page = await builder
+        .get('page', {
+          userAttributes: {
+            urlPath: '/' + (params?.page?.join('/') || ''),
+          },
+        })
+        .toPromise();
+
+      setContent(page);
+    }
+
+    fetchContent();
+  }, [params]);
+
+  if (!content && !isPreviewing) {
+    return <div>Page not found</div>;
+  }
+
+  return <BuilderComponent model="page" content={content} />;
+}   
